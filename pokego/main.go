@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"os"
 	"strings"
+
+	"pokego/services"
 )
 
 type cliCommand struct {
@@ -13,10 +15,10 @@ type cliCommand struct {
 	callback    func() error
 }
 
-
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
+	firstMapCall := true
 	for {
 		// Print prompt
 		fmt.Print("Pokedex > ")
@@ -31,6 +33,8 @@ func main() {
 
 		// Run the command
 		if command, ok := getCommands()[cleanedInput[0]]; ok {
+			if (command.name == "map" || command.name == "mapb") && firstMapCall {
+			}
 			if err := command.callback(); err != nil {
 				fmt.Println(err)
 			}
@@ -59,6 +63,16 @@ func getCommands() map[string]cliCommand {
 			name:        "help",
 			description: "Display help message",
 			callback:    commandHelp,
+		},
+		"map": {
+			name:        "map",
+			description: "Display the next 20 locations",
+			callback:    commandMap,
+		},
+		"mapb": {
+			name:        "mapb",
+			description: "Display the previous 20 locations",
+			callback:    commandMapB,
 		},
 	}
 }

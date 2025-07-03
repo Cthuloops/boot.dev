@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+
+	"pokego/services"
 )
 
 func commandHelp() error {
@@ -23,6 +25,10 @@ func commandExit() error {
 	return nil
 }
 
-func commandMap() error {
+func commandMap(c *services.Config) error {
+	return nil
+}
+
+func commandMapB(c *services.Config) error {
 	return nil
 }
