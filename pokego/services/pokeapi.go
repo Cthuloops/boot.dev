@@ -2,10 +2,14 @@ package services
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
+
+var ErrNoPreviousPage = errors.New("no previous page")
 
 type Config struct {
 	Next      string       `json:"next"`
@@ -14,7 +18,7 @@ type Config struct {
 }
 
 type Location struct {
-	name string
+	Name string
 }
 
 func NewConfig() (*Config, error) {
@@ -33,10 +37,14 @@ func (c *Config) GetNextPage() error {
 }
 
 func (c *Config) GetPreviousPage() error {
+	url := c.Previous
 	if c.Previous == "" {
-		return fmt.Errorf("no previous page")
+		return ErrNoPreviousPage
 	}
-	if err := pokeApiRequest(c.Previous, c); err != nil {
+	if strings.Contains(c.Previous, "offset=0") {
+		url = ""
+	}
+	if err := pokeApiRequest(url, c); err != nil {
 		return fmt.Errorf("error getting previous page: %w", err)
 	}
 	return nil

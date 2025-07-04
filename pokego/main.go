@@ -3,22 +3,27 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
-	"strings"
-
 	"pokego/services"
+	"strings"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func() error
+	callback    func(*services.Config) error
 }
 
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
 	firstMapCall := true
+	config, err := services.NewConfig()
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	for {
 		// Print prompt
 		fmt.Print("Pokedex > ")
@@ -32,10 +37,15 @@ func main() {
 		}
 
 		// Run the command
-		if command, ok := getCommands()[cleanedInput[0]]; ok {
-			if (command.name == "map" || command.name == "mapb") && firstMapCall {
+		if command, ok := getCommands(config)[cleanedInput[0]]; ok {
+			// I feel like there's a better way to do this.
+			if command.name == "map" && firstMapCall {
+				for _, loc := range config.Locations {
+					fmt.Println(loc.Name)
+				}
+				firstMapCall = false
 			}
-			if err := command.callback(); err != nil {
+			if err := command.callback(config); err != nil {
 				fmt.Println(err)
 			}
 			continue
@@ -52,7 +62,7 @@ func cleanInput(text string) []string {
 	return cleanedInput
 }
 
-func getCommands() map[string]cliCommand {
+func getCommands(c *services.Config) map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
 			name:        "exit",
