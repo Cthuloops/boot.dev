@@ -36,7 +36,7 @@ func main() {
 		}
 
 		// Run the command
-		if command, ok := getCommands(config)[cleanedInput[0]]; ok {
+		if command, ok := getCommands()[cleanedInput[0]]; ok {
 			if err := command.callback(config); err != nil {
 				fmt.Println(err)
 			}
@@ -54,7 +54,7 @@ func cleanInput(text string) []string {
 	return cleanedInput
 }
 
-func getCommands(c *services.Config) map[string]cliCommand {
+func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
 		"exit": {
 			name:        "exit",

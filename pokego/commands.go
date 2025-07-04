@@ -27,12 +27,17 @@ func commandExit(c *services.Config) error {
 }
 
 func commandMap(c *services.Config) error {
+	if c.GetMapCall() == 0 {
+		c.IncMapCall()
+		printLocations(c)
+		return nil
+	}
+
 	if err := c.GetNextPage(); err != nil {
 		return err
 	}
-	for _, loc := range c.Locations {
-		fmt.Println(loc.Name)
-	}
+
+	printLocations(c)
 	return nil
 }
 
@@ -44,8 +49,12 @@ func commandMapB(c *services.Config) error {
 	} else if err != nil {
 		return err
 	}
+	printLocations(c)
+	return nil
+}
+
+func printLocations(c *services.Config) {
 	for _, loc := range c.Locations {
 		fmt.Println(loc.Name)
 	}
-	return nil
 }

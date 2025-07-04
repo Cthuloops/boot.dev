@@ -21,6 +21,14 @@ type Location struct {
 	Name string
 }
 
+func (c *Config) GetMapCall() int {
+	return c.mapCall
+}
+
+func (c *Config) IncMapCall() {
+	c.mapCall++
+}
+
 func (c *Config) GetNextPage() error {
 	c.mapCall++
 	if err := pokeApiRequest(c.Next, c); err != nil {
@@ -32,7 +40,7 @@ func (c *Config) GetNextPage() error {
 func (c *Config) GetPreviousPage() error {
 	if c.mapCall > 1 {
 		c.mapCall--
-	} else if c.mapCall == 1 {
+	} else if c.mapCall <= 1 {
 		return ErrNoPreviousPage
 	}
 	if err := pokeApiRequest(c.Previous, c); err != nil {
