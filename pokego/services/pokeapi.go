@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"strings"
 )
 
 var ErrNoPreviousPage = errors.New("no previous page")
 
 type Config struct {
+	mapCall   int
 	Next      string       `json:"next"`
 	Previous  string       `json:"previous"`
 	Locations [20]Location `json:"results"`
@@ -21,15 +21,8 @@ type Location struct {
 	Name string
 }
 
-func NewConfig() (*Config, error) {
-	var config Config
-	if err := config.populateConfig(); err != nil {
-		return &Config{}, err
-	}
-	return &config, nil
-}
-
 func (c *Config) GetNextPage() error {
+	c.mapCall++
 	if err := pokeApiRequest(c.Next, c); err != nil {
 		return fmt.Errorf("error getting next page: %w", err)
 	}
@@ -37,14 +30,12 @@ func (c *Config) GetNextPage() error {
 }
 
 func (c *Config) GetPreviousPage() error {
-	url := c.Previous
-	if c.Previous == "" {
+	if c.mapCall > 1 {
+		c.mapCall--
+	} else if c.mapCall == 1 {
 		return ErrNoPreviousPage
 	}
-	if strings.Contains(c.Previous, "offset=0") {
-		url = ""
-	}
-	if err := pokeApiRequest(url, c); err != nil {
+	if err := pokeApiRequest(c.Previous, c); err != nil {
 		return fmt.Errorf("error getting previous page: %w", err)
 	}
 	return nil
@@ -55,6 +46,14 @@ func (c *Config) populateConfig() error {
 		return fmt.Errorf("error populating config: %w", err)
 	}
 	return nil
+}
+
+func NewConfig() (*Config, error) {
+	var config Config
+	if err := config.populateConfig(); err != nil {
+		return &Config{}, err
+	}
+	return &config, nil
 }
 
 func pokeApiRequest(url string, c *Config) error {

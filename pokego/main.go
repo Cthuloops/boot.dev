@@ -18,7 +18,6 @@ type cliCommand struct {
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
-	firstMapCall := true
 	config, err := services.NewConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -38,13 +37,6 @@ func main() {
 
 		// Run the command
 		if command, ok := getCommands(config)[cleanedInput[0]]; ok {
-			// I feel like there's a better way to do this.
-			if command.name == "map" && firstMapCall {
-				for _, loc := range config.Locations {
-					fmt.Println(loc.Name)
-				}
-				firstMapCall = false
-			}
 			if err := command.callback(config); err != nil {
 				fmt.Println(err)
 			}
