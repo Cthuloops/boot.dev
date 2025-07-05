@@ -5,20 +5,20 @@ import (
 	"fmt"
 	"log"
 	"os"
-	"pokego/services"
+	"pokego/internal/pokeapi"
 	"strings"
 )
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*services.Config) error
+	callback    func(*pokeapi.Config) error
 }
 
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
-	config, err := services.NewConfig()
+	config, err := pokeapi.NewConfig()
 	if err != nil {
 		log.Fatal(err)
 	}

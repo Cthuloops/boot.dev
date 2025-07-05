@@ -5,28 +5,28 @@ import (
 	"fmt"
 	"os"
 
-	"pokego/services"
+	"pokego/internal/pokeapi"
 )
 
-func commandHelp(c *services.Config) error {
+func commandHelp(c *pokeapi.Config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
 	fmt.Println()
-	for _, cmd := range getCommands(c) {
+	for _, cmd := range getCommands() {
 		fmt.Printf("%s: %s\n", cmd.name, cmd.description)
 	}
 	fmt.Println()
 	return nil
 }
 
-func commandExit(c *services.Config) error {
+func commandExit(c *pokeapi.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandMap(c *services.Config) error {
+func commandMap(c *pokeapi.Config) error {
 	if c.GetMapCall() == 0 {
 		c.IncMapCall()
 		printLocations(c)
@@ -41,10 +41,10 @@ func commandMap(c *services.Config) error {
 	return nil
 }
 
-func commandMapB(c *services.Config) error {
+func commandMapB(c *pokeapi.Config) error {
 	err := c.GetPreviousPage()
 
-	if errors.Is(err, services.ErrNoPreviousPage) {
+	if errors.Is(err, pokeapi.ErrNoPreviousPage) {
 		return fmt.Errorf("you're on the first page")
 	} else if err != nil {
 		return err
@@ -53,7 +53,7 @@ func commandMapB(c *services.Config) error {
 	return nil
 }
 
-func printLocations(c *services.Config) {
+func printLocations(c *pokeapi.Config) {
 	for _, loc := range c.Locations {
 		fmt.Println(loc.Name)
 	}
