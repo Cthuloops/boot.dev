@@ -3,17 +3,18 @@ package config
 import (
 	"time"
 
-	"pokego/internal/pokecache"
+	"pokego/internal/pokeapi"
 )
 
 type Config struct {
+	pokeapiClient    pokeapi.Client
 	NextLocationsURL *string
 	PrevLocationsURL *string
-	Cache            *pokecache.Cache
 }
 
-func NewConfig(interval time.Duration) *Config {
-	var config Config
-	config.Cache = pokecache.NewCache(interval)
+func NewConfig(timeout, interval time.Duration) *Config {
+	config := Config{
+		pokeapiClient: pokeapi.NewClient(timeout, interval),
+	}
 	return &config
 }

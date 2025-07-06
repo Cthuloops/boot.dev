@@ -10,16 +10,10 @@ import (
 	"pokego/internal/config"
 )
 
-type cliCommand struct {
-	name        string
-	description string
-	callback    func(*config.Config) error
-}
-
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
-	config := config.NewConfig(30 * time.Second)
+	config := config.NewConfig(30*time.Second, 5*time.Minute)
 
 	for {
 		// Print prompt
@@ -50,6 +44,12 @@ func cleanInput(text string) []string {
 	input := strings.ToLower(text)
 	cleanedInput := strings.Fields(input)
 	return cleanedInput
+}
+
+type cliCommand struct {
+	name        string
+	description string
+	callback    func(*config.Config) error
 }
 
 func getCommands() map[string]cliCommand {
