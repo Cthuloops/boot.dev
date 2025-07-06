@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"pokego/internal/config"
-	"pokego/internal/pokecache"
 )
 
 type cliCommand struct {
@@ -20,8 +19,7 @@ type cliCommand struct {
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
-	config := config.Config{}
-	config.Cache = pokecache.NewCache(30 * time.Second)
+	config := config.NewConfig(30 * time.Second)
 
 	for {
 		// Print prompt
