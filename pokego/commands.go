@@ -8,7 +8,7 @@ import (
 	"pokego/internal/pokeapi"
 )
 
-func commandHelp(c *pokeapi.Config) error {
+func commandHelp(config *Config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -20,41 +20,46 @@ func commandHelp(c *pokeapi.Config) error {
 	return nil
 }
 
-func commandExit(c *pokeapi.Config) error {
+func commandExit(config *Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandMap(c *pokeapi.Config) error {
-	if c.GetMapCall() == 0 {
-		c.IncMapCall()
-		printLocations(c)
-		return nil
-	}
-
-	if err := c.GetNextPage(); err != nil {
+func commandMap(config *Config) error {
+	locations, err := pokeapi.PokeApiRequest(config.nextLocationsURL)
+	if err != nil {
 		return err
 	}
 
-	printLocations(c)
+	config.nextLocationsURL = locations.Next
+	config.prevLocationsURL = locations.Previous
+
+	printLocations(&locations)
+
 	return nil
 }
 
-func commandMapB(c *pokeapi.Config) error {
-	err := c.GetPreviousPage()
+func commandMapb(config *Config) error {
+	if config.prevLocationsURL == nil {
+		return errors.New("you're on the first page")
+	}
 
-	if errors.Is(err, pokeapi.ErrNoPreviousPage) {
-		return fmt.Errorf("you're on the first page")
-	} else if err != nil {
+	locations, err := pokeapi.PokeApiRequest(config.prevLocationsURL)
+	if err != nil {
 		return err
 	}
-	printLocations(c)
+
+	config.nextLocationsURL = locations.Next
+	config.prevLocationsURL = locations.Previous
+
+	printLocations(&locations)
+
 	return nil
 }
 
-func printLocations(c *pokeapi.Config) {
-	for _, loc := range c.Locations {
-		fmt.Println(loc.Name)
+func printLocations(res *pokeapi.Response) {
+	for _, location := range res.Locations {
+		fmt.Println(location.Name)
 	}
 }
