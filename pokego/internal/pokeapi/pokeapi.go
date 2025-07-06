@@ -4,7 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
+
+	"pokego/internal/pokecache"
 )
 
 const (
@@ -21,10 +24,18 @@ type Response struct {
 	} `json:"results"`
 }
 
-func PokeApiRequest(pageURL *string) (Response, error) {
-	url := baseURL + "/location-area"
+func PokeApiRequest(pageURL *string, cache *pokecache.Cache) (Response, error) {
+	url := baseURL + "/location-area?offset=0&limit=20"
 	if pageURL != nil {
 		url = *pageURL
+	}
+
+	// If the entry is in the cache already
+	if response, ok := cache.Get(url); ok {
+		locations := Response{}
+		json.Unmarshal(response, &locations)
+		log.Printf("Cache entry was found; logging from ApiRequest\n")
+		return locations, nil
 	}
 
 	res, err := http.Get(url)
@@ -42,6 +53,9 @@ func PokeApiRequest(pageURL *string) (Response, error) {
 	if err = json.Unmarshal(body, &locations); err != nil {
 		return Response{}, fmt.Errorf("error parsing json: %w", err)
 	}
+
+	// Add new entry to the cache
+	cache.Add(url, body)
 
 	return locations, nil
 }

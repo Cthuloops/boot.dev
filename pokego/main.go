@@ -5,26 +5,23 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
+	"pokego/internal/config"
 	"pokego/internal/pokecache"
 )
-
-type Config struct {
-	nextLocationsURL *string
-	prevLocationsURL *string
-	cache            *pokecache.Cache
-}
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*Config) error
+	callback    func(*config.Config) error
 }
 
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
-	config := Config{}
+	config := config.Config{}
+	config.Cache = pokecache.NewCache(30 * time.Second)
 
 	for {
 		// Print prompt
@@ -78,6 +75,11 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Display the previous 20 locations",
 			callback:    commandMapb,
+		},
+		"ckey": {
+			name:        "ckey",
+			description: "Display cache key entries",
+			callback:    commandCkey,
 		},
 	}
 }

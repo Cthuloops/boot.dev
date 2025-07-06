@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"os"
 
+	"pokego/internal/config"
 	"pokego/internal/pokeapi"
 )
 
-func commandHelp(config *Config) error {
+func commandHelp(config *config.Config) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -20,38 +21,40 @@ func commandHelp(config *Config) error {
 	return nil
 }
 
-func commandExit(config *Config) error {
+func commandExit(config *config.Config) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
-func commandMap(config *Config) error {
-	locations, err := pokeapi.PokeApiRequest(config.nextLocationsURL)
+func commandMap(config *config.Config) error {
+	locations, err := pokeapi.PokeApiRequest(config.NextLocationsURL,
+		config.Cache)
 	if err != nil {
 		return err
 	}
 
-	config.nextLocationsURL = locations.Next
-	config.prevLocationsURL = locations.Previous
+	config.NextLocationsURL = locations.Next
+	config.PrevLocationsURL = locations.Previous
 
 	printLocations(&locations)
 
 	return nil
 }
 
-func commandMapb(config *Config) error {
-	if config.prevLocationsURL == nil {
+func commandMapb(config *config.Config) error {
+	if config.PrevLocationsURL == nil {
 		return errors.New("you're on the first page")
 	}
 
-	locations, err := pokeapi.PokeApiRequest(config.prevLocationsURL)
+	locations, err := pokeapi.PokeApiRequest(config.PrevLocationsURL,
+		config.Cache)
 	if err != nil {
 		return err
 	}
 
-	config.nextLocationsURL = locations.Next
-	config.prevLocationsURL = locations.Previous
+	config.NextLocationsURL = locations.Next
+	config.PrevLocationsURL = locations.Previous
 
 	printLocations(&locations)
 
@@ -62,4 +65,9 @@ func printLocations(res *pokeapi.Response) {
 	for _, location := range res.Locations {
 		fmt.Println(location.Name)
 	}
+}
+
+func commandCkey(config *config.Config) error {
+	config.Cache.PrintKeys()
+	return nil
 }
