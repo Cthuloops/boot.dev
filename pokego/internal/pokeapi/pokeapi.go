@@ -32,7 +32,9 @@ func PokeApiRequest(pageURL *string, cache *pokecache.Cache) (Response, error) {
 	// If the entry is in the cache already
 	if response, ok := cache.Get(url); ok {
 		locations := Response{}
-		json.Unmarshal(response, &locations)
+		if err := json.Unmarshal(response, &locations); err != nil {
+			return Response{}, err
+		}
 		return locations, nil
 	}
 
