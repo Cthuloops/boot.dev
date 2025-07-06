@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 
 	"pokego/internal/pokecache"
@@ -34,7 +33,6 @@ func PokeApiRequest(pageURL *string, cache *pokecache.Cache) (Response, error) {
 	if response, ok := cache.Get(url); ok {
 		locations := Response{}
 		json.Unmarshal(response, &locations)
-		log.Printf("Cache entry was found; logging from ApiRequest\n")
 		return locations, nil
 	}
 
