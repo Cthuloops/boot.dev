@@ -35,7 +35,7 @@ func main() {
 
 		// Run the command
 		if command, ok := getCommands()[cleanedInput[0]]; ok {
-			if err := command.callback(&config); err != nil {
+			if err := command.callback(config); err != nil {
 				fmt.Println(err)
 			}
 			continue
