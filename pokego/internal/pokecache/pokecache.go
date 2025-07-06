@@ -34,7 +34,8 @@ func (c *Cache) Add(key string, val []byte) {
 
 func (c *Cache) Get(key string) (val []byte, ok bool) {
 	c.mu.Lock()
-	if entry, ok := c.cache[key]; ok {
+	var entry cacheEntry
+	if entry, ok = c.cache[key]; ok {
 		val = entry.val
 	}
 	c.mu.Unlock()
