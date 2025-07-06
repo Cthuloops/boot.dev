@@ -3,25 +3,28 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
-	"pokego/internal/pokeapi"
 	"strings"
+
+	"pokego/internal/pokecache"
 )
+
+type Config struct {
+	nextLocationsURL *string
+	prevLocationsURL *string
+	cache            *pokecache.Cache
+}
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*pokeapi.Config) error
+	callback    func(*Config) error
 }
 
 func main() {
 
 	reader := bufio.NewScanner(os.Stdin)
-	config, err := pokeapi.NewConfig()
-	if err != nil {
-		log.Fatal(err)
-	}
+	config := Config{}
 
 	for {
 		// Print prompt
@@ -37,7 +40,7 @@ func main() {
 
 		// Run the command
 		if command, ok := getCommands()[cleanedInput[0]]; ok {
-			if err := command.callback(config); err != nil {
+			if err := command.callback(&config); err != nil {
 				fmt.Println(err)
 			}
 			continue
@@ -74,7 +77,7 @@ func getCommands() map[string]cliCommand {
 		"mapb": {
 			name:        "mapb",
 			description: "Display the previous 20 locations",
-			callback:    commandMapB,
+			callback:    commandMapb,
 		},
 	}
 }
