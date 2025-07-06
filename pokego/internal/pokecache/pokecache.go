@@ -1,7 +1,6 @@
 package pokecache
 
 import (
-	"log"
 	"sync"
 	"time"
 )
@@ -58,13 +57,5 @@ func (c *Cache) reap(now time.Time, last time.Duration) {
 		if val.createdAt.Before(now.Add(-last)) {
 			delete(c.cache, key)
 		}
-	}
-}
-
-func (c *Cache) PrintKeys() {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	for key := range c.cache {
-		log.Printf("%s", key)
 	}
 }
