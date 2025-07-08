@@ -7,14 +7,14 @@ import (
 )
 
 type Config struct {
-	pokeapiClient    pokeapi.Client
+	PokeApiClient    pokeapi.Client
 	NextLocationsURL *string
 	PrevLocationsURL *string
 }
 
 func NewConfig(timeout, interval time.Duration) *Config {
 	config := Config{
-		pokeapiClient: pokeapi.NewClient(timeout, interval),
+		PokeApiClient: pokeapi.NewClient(timeout, interval),
 	}
 	return &config
 }
