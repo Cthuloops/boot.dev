@@ -27,9 +27,8 @@ func commandExit(config *config.Config, args ...string) error {
 	return nil
 }
 
-func commandMap(config *config.Config) error {
-	locations, err := pokeapi.PokeApiRequest(config.NextLocationsURL,
-		config.Cache)
+func commandMap(config *config.Config, args ...string) error {
+	locations, err := config.PokeApiClient.ListLocations(nil)
 	if err != nil {
 		return err
 	}
@@ -47,8 +46,7 @@ func commandMapb(config *config.Config, args ...string) error {
 		return errors.New("you're on the first page")
 	}
 
-	locations, err := pokeapi.PokeApiRequest(config.PrevLocationsURL,
-		config.Cache)
+	locations, err := config.PokeApiClient.ListLocations(config.PrevLocationsURL)
 	if err != nil {
 		return err
 	}
@@ -61,7 +59,7 @@ func commandMapb(config *config.Config, args ...string) error {
 	return nil
 }
 
-func printLocations(res *pokeapi.Response) {
+func printLocations(res *pokeapi.Locations) {
 	for _, location := range res.Locations {
 		fmt.Println(location.Name)
 	}

@@ -23,13 +23,17 @@ func main() {
 
 		// Parse input
 		cleanedInput := cleanInput(reader.Text())
-		if len(cleanedInput) == 0 {
+		inputLength := len(cleanedInput)
+		if inputLength == 0 {
 			continue
 		}
 
 		// Run the command
 		if command, ok := getCommands()[cleanedInput[0]]; ok {
-			if err := command.callback(config); err != nil {
+			// Get the args and expand them into strings. If there are any
+			// that is.
+			err := command.callback(config, cleanedInput[1:]...)
+			if err != nil {
 				fmt.Println(err)
 			}
 			continue
@@ -49,7 +53,7 @@ func cleanInput(text string) []string {
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config.Config) error
+	callback    func(*config.Config, ...string) error
 }
 
 func getCommands() map[string]cliCommand {
@@ -73,11 +77,6 @@ func getCommands() map[string]cliCommand {
 			name:        "mapb",
 			description: "Display the previous 20 locations",
 			callback:    commandMapb,
-		},
-		"ckey": {
-			name:        "ckey",
-			description: "Display cache key entries",
-			callback:    commandCkey,
 		},
 	}
 }
