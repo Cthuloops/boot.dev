@@ -42,7 +42,7 @@ func pokeAPIGet[T PokeAPITypes](client *Client, pageURL *string) (T, error) {
 	// Build the URL
 	url := baseURL + locationArea
 	if pageURL != nil {
-		url += *pageURL
+		url = *pageURL
 	}
 
 	// Check if already stored in the cache
@@ -76,4 +76,8 @@ func pokeAPIGet[T PokeAPITypes](client *Client, pageURL *string) (T, error) {
 
 	client.cache.Add(url, data)
 	return result, nil
+}
+
+func GetURL(location string) string {
+	return baseURL + locationArea + location
 }
