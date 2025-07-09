@@ -20,3 +20,11 @@ func NewClient(timeout, cacheInterval time.Duration) Client {
 		},
 	}
 }
+
+func (c *Client) ListLocations(location *string) (Locations, error) {
+	return pokeAPIGet[Locations](c, location)
+}
+
+func (c *Client) PokemonAtLocation(location *string) (LocationArea, error) {
+	return pokeAPIGet[LocationArea](c, location)
+}
