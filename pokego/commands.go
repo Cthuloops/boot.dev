@@ -14,6 +14,7 @@ import (
 
 var (
 	ErrTooManyArgs = errors.New("too many arguments")
+	ErrTooFewArgs  = errors.New("too few arguments")
 )
 
 func commandHelp(config *config.Config, args ...string) error {
@@ -69,6 +70,9 @@ func commandMapb(config *config.Config, args ...string) error {
 }
 
 func commandExplore(config *config.Config, args ...string) error {
+	if len(args) == 0 {
+		return ErrTooFewArgs
+	}
 	if len(args) > 1 {
 		return ErrTooManyArgs
 	}
@@ -86,6 +90,9 @@ func commandExplore(config *config.Config, args ...string) error {
 }
 
 func commandCatch(config *config.Config, args ...string) error {
+	if len(args) == 0 {
+		return ErrTooFewArgs
+	}
 	if len(args) > 1 {
 		return ErrTooManyArgs
 	}
@@ -97,6 +104,22 @@ func commandCatch(config *config.Config, args ...string) error {
 	}
 	fmt.Printf("Throwing a Pokeball at %s...\n", pokename)
 	fmt.Printf("%s %s\n", pokename, catchPokemon(config, pokemon))
+	return nil
+}
+
+func commandInspect(config *config.Config, args ...string) error {
+	if len(args) == 0 {
+		return ErrTooFewArgs
+	}
+	if len(args) > 1 {
+		return ErrTooManyArgs
+	}
+	pokename := strings.ToLower(args[0])
+	pokemon, ok := config.Pokedex[pokename]
+	if !ok {
+		return errors.New("you have not caught that pokemon")
+	}
+	printPokeInfo(pokemon)
 	return nil
 }
 
@@ -128,4 +151,18 @@ func catchPokemon(config *config.Config, poke pokeapi.Pokemon) string {
 		return "was caught!"
 	}
 	return "escaped!"
+}
+
+func printPokeInfo(poke pokeapi.Pokemon) {
+	fmt.Println("Name:", poke.Name)
+	fmt.Println("Height:", poke.Height)
+	fmt.Println("Weight:", poke.Weight)
+	fmt.Println("Stats:")
+	for _, stat := range poke.Stats {
+		fmt.Printf("  -%s: %d\n", stat.Stat.Name, stat.BaseStat)
+	}
+	fmt.Println("Types:")
+	for _, ptype := range poke.Types {
+		fmt.Printf("  - %s\n", ptype.Type.Name)
+	}
 }
