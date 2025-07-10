@@ -123,6 +123,11 @@ func commandInspect(config *config.Config, args ...string) error {
 	return nil
 }
 
+func commandPokedex(config *config.Config, args ...string) error {
+	config.Pokedex.PrintEntryNames()
+	return nil
+}
+
 func printLocations(res *pokeapi.Locations) {
 	for _, location := range res.Locations {
 		fmt.Println(location.Name)
