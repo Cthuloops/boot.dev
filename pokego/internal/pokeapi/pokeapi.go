@@ -7,12 +7,13 @@ import (
 )
 
 const (
-	baseURL      = "https://pokeapi.co/api/v2"
-	locationArea = "/location-area/"
+	baseURL         = "https://pokeapi.co/api/v2"
+	locationArea    = "/location-area/"
+	pokemonEndpoint = "/pokemon/"
 )
 
 type PokeAPITypes interface {
-	Locations | LocationArea
+	Locations | LocationArea | Pokemon
 }
 
 type Locations struct {
@@ -33,6 +34,11 @@ type LocationArea struct {
 			URL  string `json:"url"`
 		} `json:"pokemon"`
 	} `json:"pokemon_encounters"`
+}
+
+type Pokemon struct {
+	Name           string `json:"name"`
+	BaseExperience int    `json:"base_experience"`
 }
 
 func pokeAPIGet[T PokeAPITypes](client *Client, pageURL *string) (T, error) {
@@ -78,6 +84,10 @@ func pokeAPIGet[T PokeAPITypes](client *Client, pageURL *string) (T, error) {
 	return result, nil
 }
 
-func GetURL(location string) string {
+func GetLocationURL(location string) string {
 	return baseURL + locationArea + location
+}
+
+func GetPokemonURL(pokemon string) string {
+	return baseURL + pokemonEndpoint + pokemon
 }

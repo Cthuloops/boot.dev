@@ -3,11 +3,17 @@ package main
 import (
 	"errors"
 	"fmt"
+	"math"
+	"math/rand"
 	"os"
 	"strings"
 
 	"pokego/internal/config"
 	"pokego/internal/pokeapi"
+)
+
+var (
+	ErrTooManyArgs = errors.New("too many arguments")
 )
 
 func commandHelp(config *config.Config, args ...string) error {
@@ -64,10 +70,10 @@ func commandMapb(config *config.Config, args ...string) error {
 
 func commandExplore(config *config.Config, args ...string) error {
 	if len(args) > 1 {
-		return errors.New("too many arguments")
+		return ErrTooManyArgs
 	}
-	location := pokeapi.GetURL(strings.ToLower(args[0]))
-	locationArea, err := config.PokeApiClient.PokemonAtLocation(&location)
+	locationURL := pokeapi.GetLocationURL(strings.ToLower(args[0]))
+	locationArea, err := config.PokeApiClient.PokemonAtLocation(&locationURL)
 	if err != nil {
 		return err
 	}
@@ -76,6 +82,21 @@ func commandExplore(config *config.Config, args ...string) error {
 	for _, monster := range locationArea.PokemonEncounters {
 		fmt.Printf(" - %s\n", monster.Pokemon.Name)
 	}
+	return nil
+}
+
+func commandCatch(config *config.Config, args ...string) error {
+	if len(args) > 1 {
+		return ErrTooManyArgs
+	}
+	pokename := strings.ToLower(args[0])
+	pokeURL := pokeapi.GetPokemonURL(pokename)
+	pokemon, err := config.PokeApiClient.PokemonInfo(&pokeURL)
+	if err != nil {
+		return err
+	}
+	fmt.Printf("Throwing a Pokeball at %s...\n", pokename)
+	fmt.Printf("%s %s\n", pokename, catchPokemon(config, pokemon))
 	return nil
 }
 
@@ -93,4 +114,18 @@ func getMaxCommandNameLength(commands map[string]cliCommand) int {
 		}
 	}
 	return maxWidth
+}
+
+func catchPokemon(config *config.Config, poke pokeapi.Pokemon) string {
+	modifier := math.Log1p(float64(poke.BaseExperience)) / 10.0
+	successRate := 0.85 - min(modifier, 0.35)
+	roll := rand.Float64()
+
+	if roll >= successRate {
+		if _, ok := config.Pokedex[poke.Name]; !ok {
+			config.Pokedex[poke.Name] = poke
+		}
+		return "was caught!"
+	}
+	return "escaped!"
 }

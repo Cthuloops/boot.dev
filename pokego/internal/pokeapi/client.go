@@ -28,3 +28,7 @@ func (c *Client) ListLocations(location *string) (Locations, error) {
 func (c *Client) PokemonAtLocation(location *string) (LocationArea, error) {
 	return pokeAPIGet[LocationArea](c, location)
 }
+
+func (c *Client) PokemonInfo(pokemon *string) (Pokemon, error) {
+	return pokeAPIGet[Pokemon](c, pokemon)
+}
